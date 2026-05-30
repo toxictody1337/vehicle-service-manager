@@ -1,0 +1,17 @@
+{
+  "domain": "vehicle_service",
+  "name": "Vehicle Service Manager",
+  "version": "1.1.0",
+  "documentation": "https://github.com/toxictody1337/vehicle-service-manager#readme",
+  "issue_tracker": "https://github.com/toxictody1337/vehicle-service-manager/issues",
+  "codeowners": [
+    "@toxictody1337"
+  ],
+  "requirements": [],
+  "dependencies": [
+    "frontend"
+  ],
+  "config_flow": true,
+  "iot_class": "local_push",
+  "integration_type": "hub"
+}

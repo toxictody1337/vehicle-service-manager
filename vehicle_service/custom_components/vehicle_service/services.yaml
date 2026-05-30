@@ -1,0 +1,210 @@
+add_service_entry:
+  name: Service-Eintrag hinzufügen
+  description: >
+    Fügt einen Service-Eintrag zur Historie eines Fahrzeugs hinzu und aktualisiert
+    den Zeitpunkt des letzten Services für die angegebenen Service-Punkte.
+  fields:
+    vehicle_id:
+      name: Fahrzeug-ID
+      description: Die interne UUID des Fahrzeugs (aus den Entity-Attributen).
+      required: true
+      selector:
+        text:
+    entry_date:
+      name: Datum
+      description: Datum des Services (Format YYYY-MM-DD).
+      required: true
+      selector:
+        date:
+    km:
+      name: Kilometerstand
+      description: Kilometerstand bei Durchführung des Services.
+      required: true
+      selector:
+        number:
+          min: 0
+          max: 9999999
+          unit_of_measurement: km
+    services:
+      name: Service-Punkte
+      description: Liste der durchgeführten Service-Punkte (z.B. ["oil", "inspection"]).
+      required: true
+      selector:
+        select:
+          multiple: true
+          options:
+            - oil
+            - inspection
+            - brake_fluid
+            - cabin_filter
+            - air_filter
+            - spark_plugs
+            - fuel_filter
+            - gearbox
+            - haldex
+            - ac
+            - hu
+    notes:
+      name: Notizen
+      description: Optionale Notizen zum Service (z.B. Werkstattname).
+      required: false
+      selector:
+        text:
+
+update_km:
+  name: Kilometerstand aktualisieren
+  description: >
+    Aktualisiert den Kilometerstand eines Fahrzeugs manuell.
+    (Bei konfigurierter KM-Entität wird der Stand automatisch übernommen.)
+  fields:
+    vehicle_id:
+      name: Fahrzeug-ID
+      description: Die interne UUID des Fahrzeugs.
+      required: true
+      selector:
+        text:
+    km:
+      name: Kilometerstand
+      description: Neuer Kilometerstand.
+      required: true
+      selector:
+        number:
+          min: 0
+          max: 9999999
+          unit_of_measurement: km
+
+add_repair:
+  name: Reparatur hinzufügen
+  description: Fügt einen Reparatur- oder Verschleißeintrag hinzu.
+  fields:
+    vehicle_id:
+      name: Fahrzeug-ID
+      required: true
+      selector:
+        text:
+    entry_date:
+      name: Datum
+      required: true
+      selector:
+        date:
+    km:
+      name: Kilometerstand
+      required: true
+      selector:
+        number:
+          min: 0
+          max: 9999999
+          unit_of_measurement: km
+    category:
+      name: Kategorie
+      required: true
+      selector:
+        select:
+          options:
+            - brakes_front
+            - brakes_rear
+            - brakes_full
+            - discs_front
+            - discs_rear
+            - shock_front
+            - shock_rear
+            - timing_belt
+            - battery
+            - clutch
+            - other
+    description:
+      name: Beschreibung
+      required: false
+      selector:
+        text:
+    cost:
+      name: Kosten (€)
+      required: false
+      selector:
+        number:
+          min: 0
+          max: 99999
+          unit_of_measurement: "€"
+
+add_tire:
+  name: Reifen eintragen
+  description: Trägt einen neuen Reifensatz ein.
+  fields:
+    vehicle_id:
+      name: Fahrzeug-ID
+      required: true
+      selector:
+        text:
+    entry_date:
+      name: Datum (Aufziehen)
+      required: true
+      selector:
+        date:
+    km:
+      name: Kilometerstand beim Aufziehen
+      required: true
+      selector:
+        number:
+          min: 0
+          max: 9999999
+          unit_of_measurement: km
+    type:
+      name: Reifentyp
+      required: true
+      selector:
+        select:
+          options:
+            - summer
+            - winter
+            - allseason
+    axle:
+      name: Achse
+      required: true
+      selector:
+        select:
+          options:
+            - all
+            - front
+            - rear
+    brand:
+      name: Marke / Hersteller
+      required: false
+      selector:
+        text:
+    dot:
+      name: DOT-Code (4 Ziffern)
+      required: false
+      selector:
+        text:
+    vl:
+      name: Profiltiefe VL (mm)
+      required: false
+      selector:
+        number:
+          min: 0
+          max: 12
+          step: 0.5
+    vr:
+      name: Profiltiefe VR (mm)
+      required: false
+      selector:
+        number:
+          min: 0
+          max: 12
+          step: 0.5
+    hl:
+      name: Profiltiefe HL (mm)
+      required: false
+      selector:
+        number:
+          min: 0
+          max: 12
+          step: 0.5
+    hr:
+      name: Profiltiefe HR (mm)
+      required: false
+      selector:
+        number:
+          min: 0
+          max: 12
+          step: 0.5

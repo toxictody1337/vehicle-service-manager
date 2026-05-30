@@ -1,0 +1,126 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Fahrzeugdaten (1/3)",
+        "description": "Grundlegende Fahrzeugdaten eingeben. Die Erstzulassung wird als Ausgangspunkt für Zeit-Intervalle genutzt, solange kein Serviceeintrag vorhanden ist.",
+        "data": {
+          "make": "Hersteller",
+          "model": "Modell",
+          "ez_month": "Monat der Erstzulassung",
+          "ez_year": "Jahr der Erstzulassung",
+          "km": "Aktueller Kilometerstand",
+          "plate": "Kennzeichen",
+          "hu_known": "Datum der letzten HU/AU bekannt?",
+          "hu_month": "Monat (letzte HU/AU)",
+          "hu_year": "Jahr (letzte HU/AU)",
+          "hu_km": "Kilometerstand bei letzter HU/AU",
+          "vin": "Fahrgestellnummer VIN (optional, 17 Zeichen)",
+          "hsn": "Schlüsselnummer HSN/TSN (optional)",
+          "entity_km": "Live KM-Stand Entität (optional)"
+        },
+        "data_description": {
+          "entity_km": "Sensor-Entität die den aktuellen Kilometerstand liefert (z.B. OBD-Dongle).",
+          "hu_known": "Falls bekannt, wird automatisch ein Service-Eintrag für die HU/AU angelegt.",
+          "vin": "Die Fahrgestellnummer besteht aus genau 17 Zeichen."
+        }
+      },
+      "services": {
+        "title": "Service-Punkte (2/3)",
+        "description": "Wähle die Wartungspunkte aus, die du überwachen möchtest.",
+        "data": {
+          "oil":          "Ölwechsel",
+          "inspection":   "Inspektion",
+          "brake_fluid":  "Bremsflüssigkeit",
+          "cabin_filter": "Innenraumfilter",
+          "air_filter":   "Luftfilter",
+          "spark_plugs":  "Zündkerzen (nur Benziner)",
+          "fuel_filter":  "Kraftstofffilter (nur Diesel)",
+          "gearbox":      "Getriebeöl",
+          "haldex":       "Haldex-Öl (nur Allrad)",
+          "ac":           "Klimawartung",
+          "hu":           "Hauptuntersuchung (HU/AU)"
+        }
+      },
+      "intervals": {
+        "title": "Service-Intervalle (3/3)",
+        "description": "{disclaimer}",
+        "data": {
+          "oil_km":             "Ölwechsel – km-Intervall",
+          "oil_months":         "Ölwechsel – Monate",
+          "inspection_km":      "Inspektion – km-Intervall",
+          "inspection_months":  "Inspektion – Monate",
+          "brake_fluid_months": "Bremsflüssigkeit – Monate",
+          "cabin_filter_km":    "Innenraumfilter – km-Intervall",
+          "cabin_filter_months":"Innenraumfilter – Monate",
+          "air_filter_km":      "Luftfilter – km-Intervall",
+          "air_filter_months":  "Luftfilter – Monate",
+          "spark_plugs_km":     "Zündkerzen – km-Intervall",
+          "spark_plugs_months": "Zündkerzen – Monate",
+          "fuel_filter_km":     "Kraftstofffilter – km-Intervall",
+          "fuel_filter_months": "Kraftstofffilter – Monate",
+          "gearbox_km":         "Getriebeöl – km-Intervall",
+          "haldex_km":          "Haldex-Öl – km-Intervall",
+          "haldex_months":      "Haldex-Öl – Monate",
+          "ac_months":          "Klimawartung – Monate",
+          "hu_months":          "HU/AU – Monate"
+        }
+      }
+    },
+    "error": {
+      "invalid_date": "Ungültiges Datum.",
+      "no_service_selected": "Bitte mindestens einen Service-Punkt auswählen.",
+      "vin_length": "Die Fahrgestellnummer muss genau 17 Zeichen lang sein."
+    },
+    "abort": {
+      "already_configured": "Dieses Fahrzeug ist bereits konfiguriert."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Fahrzeugdaten bearbeiten",
+        "description": "Alle Fahrzeugdaten können hier geändert werden.",
+        "data": {
+          "make": "Hersteller",
+          "model": "Modell",
+          "ez_month": "Monat der Erstzulassung",
+          "ez_year": "Jahr der Erstzulassung",
+          "km": "Aktueller Kilometerstand",
+          "plate": "Kennzeichen",
+          "vin": "Fahrgestellnummer VIN (17 Zeichen)",
+          "hsn": "Schlüsselnummer HSN/TSN",
+          "entity_km": "Live KM-Stand Entität"
+        },
+        "data_description": {
+          "entity_km": "Nach dem Speichern wird die Integration neu geladen.",
+          "vin": "Die Fahrgestellnummer besteht aus genau 17 Zeichen."
+        }
+      },
+      "intervals": {
+        "title": "Service-Intervalle bearbeiten",
+        "description": "{disclaimer}",
+        "data": {
+          "oil_km":             "Ölwechsel – km-Intervall",
+          "oil_months":         "Ölwechsel – Monate",
+          "inspection_km":      "Inspektion – km-Intervall",
+          "inspection_months":  "Inspektion – Monate",
+          "brake_fluid_months": "Bremsflüssigkeit – Monate",
+          "cabin_filter_km":    "Innenraumfilter – km-Intervall",
+          "cabin_filter_months":"Innenraumfilter – Monate",
+          "air_filter_km":      "Luftfilter – km-Intervall",
+          "air_filter_months":  "Luftfilter – Monate",
+          "spark_plugs_km":     "Zündkerzen – km-Intervall",
+          "spark_plugs_months": "Zündkerzen – Monate",
+          "fuel_filter_km":     "Kraftstofffilter – km-Intervall",
+          "fuel_filter_months": "Kraftstofffilter – Monate",
+          "gearbox_km":         "Getriebeöl – km-Intervall",
+          "haldex_km":          "Haldex-Öl – km-Intervall",
+          "haldex_months":      "Haldex-Öl – Monate",
+          "ac_months":          "Klimawartung – Monate",
+          "hu_months":          "HU/AU – Monate"
+        }
+      }
+    }
+  }
+}

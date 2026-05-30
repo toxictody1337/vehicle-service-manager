@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>VSM Cleanup</title>
+<style>
+body{font-family:monospace;background:#111;color:#eee;padding:20px;max-width:800px}
+pre{background:#222;padding:12px;border-radius:6px;overflow-x:auto;font-size:12px;white-space:pre-wrap;word-break:break-all}
+button{padding:8px 16px;background:#1976d2;color:#fff;border:none;border-radius:4px;cursor:pointer;margin:4px}
+button.del{background:#c62828}
+button.keep{background:#2e7d32}
+.vcard{background:#1e1e1e;border:1px solid #333;border-radius:8px;padding:12px;margin:8px 0}
+.vcard h3{margin:0 0 8px;font-size:14px}
+.vcard p{margin:2px 0;font-size:12px;color:#aaa}
+.ok{color:#4caf50}.err{color:#f44336}.warn{color:#ff9800}
+</style></head>
+<body>
+<h2>🔧 VSM Cleanup Tool</h2>
+<p>Zeigt alle Fahrzeuge im Store und ermöglicht das Löschen doppelter Einträge.</p>
+<button onclick="connect()">Verbinden &amp; Fahrzeuge laden</button>
+<div id="status"></div>
+<div id="vehicles"></div>
+
+<script>
+let ws, msgId=1, token='', vehicles={};
+
+function log(msg, cls){
+  document.getElementById('status').innerHTML += `<span class="${cls||''}">${msg}</span><br>`;
+}
+
+function connect(){
+  token = prompt('Long-Lived Access Token eingeben\n(Profil → Sicherheit → Langfristige Zugriffstoken)');
+  if(!token)return;
+  document.getElementById('status').innerHTML='';
+  log('Verbinde...');
+  ws = new WebSocket(`wss://${location.host}/api/websocket`);
+  ws.onopen = ()=>log('✓ Verbunden','ok');
+  ws.onmessage = handleMsg;
+  ws.onerror = e=>log('✗ Fehler: '+e,'err');
+  ws.onclose = ()=>log('Getrennt.');
+}
+
+function send(msg){
+  const id=msgId++;
+  msg.id=id;
+  ws.send(JSON.stringify(msg));
+  return id;
+}
+
+let pendingResolvers={};
+function sendWait(msg){
+  return new Promise(resolve=>{
+    const id=msgId++;
+    msg.id=id;
+    pendingResolvers[id]=resolve;
+    ws.send(JSON.stringify(msg));
+  });
+}
+
+function handleMsg(e){
+  const msg=JSON.parse(e.data);
+  if(msg.type==='auth_required'){
+    log('Authentifiziere...');
+    ws.send(JSON.stringify({type:'auth',access_token:token}));
+  } else if(msg.type==='auth_ok'){
+    log('✓ Auth OK – lade Fahrzeuge...','ok');
+    sendWait({type:'vehicle_service/vehicles'}).then(r=>{
+      if(r.success){
+        vehicles=r.result.vehicles||{};
+        renderVehicles();
+      } else {
+        log('✗ Fehler: '+JSON.stringify(r.error),'err');
+      }
+    });
+  } else if(msg.type==='auth_invalid'){
+    log('✗ Auth fehlgeschlagen','err');
+  } else if(msg.type==='result' && pendingResolvers[msg.id]){
+    pendingResolvers[msg.id](msg);
+    delete pendingResolvers[msg.id];
+  }
+}
+
+function renderVehicles(){
+  const el=document.getElementById('vehicles');
+  const entries=Object.entries(vehicles);
+  log(`✓ ${entries.length} Fahrzeug(e) gefunden`,'ok');
+  
+  if(entries.length===0){el.innerHTML='<p class="ok">Keine Fahrzeuge vorhanden.</p>';return;}
+  
+  // Group by make+model to find duplicates
+  const groups={};
+  entries.forEach(([id,v])=>{
+    const key=`${v.make} ${v.model}`;
+    if(!groups[key])groups[key]=[];
+    groups[key].push({id,v});
+  });
+  
+  let html='<h3 style="margin-top:20px">Fahrzeuge im Store:</h3>';
+  Object.entries(groups).forEach(([name, items])=>{
+    if(items.length>1) html+=`<p class="warn">⚠ ${items.length}x "${name}" gefunden – Duplikate!</p>`;
+    items.forEach(({id,v},i)=>{
+      const isDupe=items.length>1;
+      const hasData=(v.history||[]).length>0||(v.repairs||[]).length>0||(v.tires||[]).length>0;
+      html+=`<div class="vcard">
+        <h3>${v.make} ${v.model} ${isDupe?(i===0?'<span class="ok">[ERSTER]</span>':'<span class="warn">[DUPLIKAT]</span>'):''}
+          ${hasData?'<span class="ok">✓ Hat Daten</span>':'<span style="color:#666">Keine Daten</span>'}
+        </h3>
+        <p>ID: <code>${id}</code></p>
+        <p>KM: ${v.km||0} · EZ: ${v.ezDate||'—'} · Kennzeichen: ${v.plate||'—'}</p>
+        <p>Service-Einträge: ${(v.history||[]).length} · Reparaturen: ${(v.repairs||[]).length} · Reifen: ${(v.tires||[]).length}</p>
+        <p>Services: ${(v.services||[]).join(', ')||'—'}</p>
+        <br>
+        ${isDupe && !hasData 
+          ? `<button class="del" onclick="deleteVehicle('${id}','${v.make} ${v.model}')">✕ Löschen (keine Daten)</button>`
+          : isDupe 
+          ? `<button class="del" onclick="deleteVehicle('${id}','${v.make} ${v.model}')">✕ Trotzdem löschen</button>`
+          : '<span class="ok">✓ Behalten</span>'
+        }
+      </div>`;
+    });
+  });
+  el.innerHTML=html;
+}
+
+async function deleteVehicle(id, name){
+  if(!confirm(`Fahrzeug "${name}" (${id}) wirklich löschen?\nDieser Vorgang kann nicht rückgängig gemacht werden.`))return;
+  log(`Lösche ${id}...`);
+  const r=await sendWait({type:'vehicle_service/delete_vehicle',vehicle_id:id});
+  if(r.success){
+    log(`✓ ${name} gelöscht`,'ok');
+    delete vehicles[id];
+    renderVehicles();
+  } else {
+    log(`✗ Fehler: ${JSON.stringify(r.error||r)}`,'err');
+  }
+}
+</script>
+</body></html>

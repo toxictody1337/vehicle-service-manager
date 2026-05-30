@@ -1,0 +1,8 @@
+{
+  "name": "Vehicle Service Manager",
+  "domains": ["sensor", "binary_sensor"],
+  "iot_class": "local_push",
+  "render_readme": true,
+  "homeassistant": "2023.6.0",
+  "content_in_root": false
+}

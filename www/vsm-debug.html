@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>VSM Debug</title>
+<style>body{font-family:monospace;background:#111;color:#eee;padding:20px}
+pre{background:#222;padding:12px;border-radius:6px;overflow-x:auto;font-size:12px}
+button{padding:8px 16px;background:#1976d2;color:#fff;border:none;border-radius:4px;cursor:pointer;margin:4px}
+.ok{color:#4caf50}.err{color:#f44336}.warn{color:#ff9800}</style>
+</head><body>
+<h2>Vehicle Service Manager – Debug</h2>
+<p>Diese Seite testet den WebSocket-Endpunkt direkt.<br>
+Öffne sie unter: <code>http://YOUR-HA-IP:8123/local/vsm-debug.html</code></p>
+<button onclick="testWS()">WebSocket testen</button>
+<button onclick="location.reload()">Neu laden</button>
+<pre id="out">Klicke auf "WebSocket testen"...</pre>
+<script>
+function log(msg, cls) {
+  const el = document.getElementById('out');
+  el.innerHTML += `<span class="${cls||''}">${msg}</span>\n`;
+}
+async function testWS() {
+  const el = document.getElementById('out');
+  el.innerHTML = '';
+  log('Suche HA WebSocket...');
+  // HA exposes window.hassConnection from the main UI – but debug page needs token
+  // Use the HA auth flow
+  const token = prompt('Bitte HA Long-Lived Access Token eingeben\n(Profil → Sicherheit → Langfristige Zugriffstoken)');
+  if (!token) { log('Abgebrochen.','warn'); return; }
+  log('Verbinde WebSocket...');
+  const ws = new WebSocket(`wss://${location.host}/api/websocket`);
+  let msgId = 1;
+  ws.onopen = () => log('✓ Verbunden','ok');
+  ws.onmessage = (e) => {
+    const msg = JSON.parse(e.data);
+    if (msg.type === 'auth_required') {
+      log('Sende Auth-Token...');
+      ws.send(JSON.stringify({type:'auth', access_token: token}));
+    } else if (msg.type === 'auth_ok') {
+      log('✓ Authentifiziert als: ' + msg.ha_version,'ok');
+      log('\nSende: vehicle_service/vehicles...');
+      ws.send(JSON.stringify({id: msgId++, type: 'vehicle_service/vehicles'}));
+    } else if (msg.type === 'auth_invalid') {
+      log('✗ Auth fehlgeschlagen: ' + msg.message,'err');
+      ws.close();
+    } else if (msg.type === 'result') {
+      if (msg.success) {
+        log('✓ WebSocket Antwort:', 'ok');
+        log(JSON.stringify(msg.result, null, 2));
+        const vehicles = Object.entries(msg.result.vehicles || {});
+        log(`\n→ ${vehicles.length} Fahrzeug(e) gefunden`, vehicles.length ? 'ok' : 'warn');
+        vehicles.forEach(([id, v]) => {
+          log(`  ID: ${id}`,'ok');
+          log(`  Make: ${v.make}, Model: ${v.model}`,'ok');
+          log(`  Services: ${JSON.stringify(v.services)}`,'ok');
+          log(`  KM: ${v.km}`,'ok');
+        });
+      } else {
+        log('✗ Fehler: ' + JSON.stringify(msg.error),'err');
+      }
+      ws.close();
+    } else if (msg.type === 'event') {
+      // ignore
+    } else {
+      log('Nachricht: ' + JSON.stringify(msg));
+    }
+  };
+  ws.onerror = (e) => log('✗ WebSocket Fehler: ' + e,'err');
+  ws.onclose = () => log('\nVerbindung geschlossen.');
+}
+</script></body></html>

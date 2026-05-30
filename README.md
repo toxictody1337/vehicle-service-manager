@@ -41,19 +41,9 @@ Der Einrichtungsassistent führt durch 3 Schritte:
 
 > ⚠️ Die voreingestellten Intervalle sind Richtwerte. Bitte im Serviceheft oder der Bedienungsanleitung prüfen und anpassen. Bei Unsicherheit Werkstatt befragen. Keine Haftung für Schäden durch falsche Werte.
 
-### 3. Lovelace-Karte hinzufügen
+### 3. Lovelace-Kartenset hinzufügen
 
-Die JavaScript-Datei wird automatisch als Lovelace-Ressource registriert.  
-Dashboard → **Karte hinzufügen** → **Benutzerdefinierte Karten** → **Vehicle Service Card**
-
-Oder manuell in der Lovelace-YAML:
-```yaml
-type: custom:vehicle-service-card
-```
-
----
-
-## Entities
+Das Lovelace Kartenset wird für die Ausführung der Integration zwingen benötigt--> https://github.com/toxictody1337/vehicle-service-card
 
 Pro Fahrzeug werden folgende Entities erstellt:
 

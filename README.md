@@ -13,6 +13,7 @@ Trackt Service-Intervalle, Reparaturen und Reifenverschleiß für deine Fahrzeug
 - **11 Service-Punkte**: Ölwechsel, Inspektion, Bremsflüssigkeit, Innenraumfilter, Luftfilter, Zündkerzen, Kraftstofffilter, Getriebeöl, Haldex-Öl, Klimawartung, HU/AU
 - **Reparaturen & Verschleiß**: Bremsen, Stoßdämpfer, Zahnriemen, Batterie, Kupplung u.a.
 - **Reifentracking**: 4 Radpositionen, Profiltiefe, DOT-Alter, Verschleißprojektion (1,5 mm / 10.000 km)
+- **Herstellerlogos** automatisch erkannt (30+ Marken)
 - **Mehrere Fahrzeuge** parallel
 - **Binary Sensors** für Automationen (Service fällig)
 - **HA Services** zum Hinzufügen von Einträgen aus Automationen

@@ -1,7 +1,7 @@
 {
   "domain": "vehicle_service",
   "name": "Vehicle Service Manager",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "documentation": "https://github.com/toxictody1337/vehicle-service-manager#readme",
   "issue_tracker": "https://github.com/toxictody1337/vehicle-service-manager/issues",
   "codeowners": [

@@ -61,10 +61,17 @@ const SVC_LABELS = {
   ac:"Klimawartung", hu:"Hauptuntersuchung (HU/AU)",
 };
 const SVC_ICONS = {
-  oil:"mdi:oil", inspection:"mdi:clipboard-check-outline", brake_fluid:"mdi:disc",
-  cabin_filter:"mdi:air-filter", air_filter:"mdi:air-filter", spark_plugs:"mdi:bolt",
-  fuel_filter:"mdi:gas-station", gearbox:"mdi:car-manual-transmission",
-  haldex:"mdi:car-4wd", ac:"mdi:air-conditioner", hu:"mdi:car-search",
+  oil:          "mdi:oil",
+  inspection:   "mdi:clipboard-check-outline",
+  brake_fluid:  "mdi:car-brake-alert",
+  cabin_filter: "mdi:fan",
+  air_filter:   "mdi:air-filter",
+  spark_plugs:  "mdi:lightning-bolt",
+  fuel_filter:  "mdi:gas-station",
+  gearbox:      "mdi:car-manual-transmission",
+  haldex:       "mdi:car-4wd",
+  ac:           "mdi:air-conditioner",
+  hu:           "mdi:car-search",
 };
 const REP_LABELS = {
   brakes_front:"Bremse vorne", brakes_rear:"Bremse hinten", brakes_full:"Bremsen komplett",
@@ -833,34 +840,31 @@ class VehicleServiceCompactCard extends HTMLElement {
 
   _main() {
     const v=this._v();
-    const pills=this._vehicles.length>1 ? `<div class="cpills">${this._vehicles.map((vv,i)=>{
-      const lg=logoHtml(v.make||"",16);
-      return`<button class="cpill${i===this._cur?" on":""}" data-ci="${i}">${lg}</button>`;
-    }).join("")}</div>` : "";
 
-    // Vehicle name + logo
-    const lg=logoHtml(v.make||"",16);
+    // Vehicle pills (only if multiple vehicles)
+    const pills=this._vehicles.length>1
+      ? `<div class="cpills">${this._vehicles.map((vv,i)=>`
+          <button class="cpill${i===this._cur?" on":""}" data-ci="${i}">
+            ${logoHtml(vv.make||"",14)}
+          </button>`).join("")}</div>`
+      : "";
 
-    // Build icon grid
+    // Header: logo + name + km
+    const vLogo=logoHtml(v.make||"",28);
+
+    // Service icons — colored squares only, no text
     const icons=(v.services||[]).map(sid=>{
-      const r=calcPct(v,sid);
+      const r  =calcPct(v,sid);
       const col=TIER_COL[r.tier];
-      const bg=TIER_BG[r.tier];
-      // Due info line
-      const parts=[];
-      if(r.kl!==null) parts.push(r.kl<=0?"Jetzt!":fkm(r.kl));
-      if(r.ml!==null) parts.push(r.ml<=0?"Jetzt!":r.ml+" Mon.");
-      const dueStr=parts.join(" / ");
-      return`<div class="iblock" title="${SVC_LABELS[sid]||sid}">
-        <div class="iico" style="background:${bg};color:${col}"><ha-icon icon="${SVC_ICONS[sid]||"mdi:wrench"}"></ha-icon></div>
-        <div class="ilbl">${(SVC_LABELS[sid]||sid).split(" ")[0]}</div>
-        <div class="idue" style="color:${col}">${dueStr}</div>
+      const bg =TIER_BG[r.tier];
+      return `<div class="iico" style="background:${bg};color:${col}" title="${SVC_LABELS[sid]||sid}">
+        <ha-icon icon="${SVC_ICONS[sid]||"mdi:wrench"}"></ha-icon>
       </div>`;
     }).join("");
 
-    // Tyre status
+    // Tyre icon
     const tires=v.tires||[];
-    let tireIcon="";
+    let tireIco="";
     if(tires.length){
       const lat=tires[tires.length-1];
       const tt=lat.type||"summer"; const wm=TIRE_WARN[tt]||3; const mKm=parseInt(lat.km)||0;
@@ -870,26 +874,22 @@ class VehicleServiceCompactCard extends HTMLElement {
         if(orig){const worn=Math.max(0,orig-Math.max(0,(v.km||0)-mKm)*WEAR);if(worn<worst)worst=worn;}
       });
       const col=worst<=TIRE_MIN?"#A32D2D":worst<=wm?"#BA7517":"#3B6D11";
-      const bg=worst<=TIRE_MIN?"#FCEBEB":worst<=wm?"#FAEEDA":"#EAF3DE";
-      const tLbl={summer:"Sommer",winter:"Winter",allseason:"Ganzjahr"}[tt]||tt;
-      tireIcon=`<div class="iblock" title="Reifen \u2013 ${tLbl}">
-        <div class="iico" style="background:${bg};color:${col}"><ha-icon icon="mdi:tire"></ha-icon></div>
-        <div class="ilbl">Reifen</div>
-        <div class="idue" style="color:${col}">${worst<=TIRE_MIN?"Kritisch":worst<=wm?"Grenzw.":"OK"}</div>
+      const bg =worst<=TIRE_MIN?"#FCEBEB":worst<=wm?"#FAEEDA":"#EAF3DE";
+      tireIco=`<div class="iico" style="background:${bg};color:${col}" title="Reifen">
+        <ha-icon icon="mdi:car-tire-alert"></ha-icon>
       </div>`;
     }
 
     return `${pills}
       <div class="chdr">
-        ${lg}
-        <div>
+        ${vLogo}
+        <div class="chdr-text">
           <div class="cvtit">${v.make||""} ${v.model||""}</div>
           <div class="cvkm">${fkm(v.km)}</div>
         </div>
       </div>
-      <div class="igrid">${icons}${tireIcon}</div>`;
+      <div class="igrid">${icons}${tireIco}</div>`;
   }
-
   _bindCompact() {
     this.shadowRoot.querySelectorAll(".cpill").forEach(b=>b.addEventListener("click",()=>{this._cur=parseInt(b.dataset.ci);this._paint();}));
   }
@@ -912,11 +912,9 @@ class VehicleServiceCompactCard extends HTMLElement {
     .cinit{width:28px;height:28px;border-radius:50%;background:var(--secondary-background-color);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex-shrink:0}
     .cvtit{font-size:13px;font-weight:500}
     .cvkm{font-size:11px;color:var(--secondary-text-color)}
-    .igrid{display:flex;flex-wrap:wrap;gap:6px}
-    .iblock{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:52px}
-    .iico{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;--mdc-icon-size:20px}
-    .ilbl{font-size:9px;color:var(--secondary-text-color);text-align:center;max-width:52px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
-    .idue{font-size:9px;font-weight:500;text-align:center;max-width:52px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+    .igrid{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+    .iico{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;--mdc-icon-size:22px;flex-shrink:0}
+    .chdr-text{flex:1;min-width:0}
   `; }
 }
 

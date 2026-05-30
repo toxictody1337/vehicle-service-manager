@@ -61,10 +61,17 @@ const SVC_LABELS = {
   ac:"Klimawartung", hu:"Hauptuntersuchung (HU/AU)",
 };
 const SVC_ICONS = {
-  oil:"mdi:oil", inspection:"mdi:clipboard-check-outline", brake_fluid:"mdi:disc",
-  cabin_filter:"mdi:air-filter", air_filter:"mdi:air-filter", spark_plugs:"mdi:bolt",
-  fuel_filter:"mdi:gas-station", gearbox:"mdi:car-manual-transmission",
-  haldex:"mdi:car-4wd", ac:"mdi:air-conditioner", hu:"mdi:car-search",
+  oil:          "mdi:oil",
+  inspection:   "mdi:clipboard-check-outline",
+  brake_fluid:  "mdi:car-brake-alert",
+  cabin_filter: "mdi:fan",
+  air_filter:   "mdi:air-filter",
+  spark_plugs:  "mdi:lightning-bolt",
+  fuel_filter:  "mdi:gas-station",
+  gearbox:      "mdi:car-manual-transmission",
+  haldex:       "mdi:car-4wd",
+  ac:           "mdi:air-conditioner",
+  hu:           "mdi:car-search",
 };
 const REP_LABELS = {
   brakes_front:"Bremse vorne", brakes_rear:"Bremse hinten", brakes_full:"Bremsen komplett",
@@ -261,14 +268,24 @@ class VehicleServiceCompactCard extends HTMLElement {
     .cinit{width:28px;height:28px;border-radius:50%;background:var(--secondary-background-color);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex-shrink:0}
     .cvtit{font-size:13px;font-weight:500}
     .cvkm{font-size:11px;color:var(--secondary-text-color)}
-    .igrid{display:flex;flex-wrap:wrap;gap:6px}
-    .iblock{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:52px}
-    .iico{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;--mdc-icon-size:20px}
-    .ilbl{font-size:9px;color:var(--secondary-text-color);text-align:center;max-width:52px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
-    .idue{font-size:9px;font-weight:500;text-align:center;max-width:52px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+    .igrid{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+    .iico{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;--mdc-icon-size:22px;flex-shrink:0}
+    .chdr-text{flex:1;min-width:0}
   `; }
 }
 
+if (!customElements.get("vehicle-service-compact-card")) { customElements.define("vehicle-service-compact-card", VehicleServiceCompactCard); }
+
+window.customCards = window.customCards || [];
+window.customCards = window.customCards.filter(c => c.type !== "vehicle-service-compact-card");
+window.customCards.push({
+  type:        "vehicle-service-compact-card",
+  name:        "Vehicle Service Manager \u2013 Kompakt",
+  description: "Kompakte Icon-\u00DCbersicht mit Farbstatus und F\u00E4lligkeitsanzeige",
+  preview:     true,
+  documentationURL: "https://github.com/toxictody1337/vehicle-service-manager",
+});
+window.dispatchEvent(new CustomEvent("ll-custom-cards-updated"));
 if (!customElements.get("vehicle-service-compact-card")) { customElements.define("vehicle-service-compact-card", VehicleServiceCompactCard); }
 
 window.customCards = window.customCards || [];
